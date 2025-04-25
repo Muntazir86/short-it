@@ -1,0 +1,1140 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Short-It API",
+    "description": "API documentation for Short-It URL shortener service",
+    "version": "1.0.0",
+    "contact": {
+      "email": "support@short-it.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "Development server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "URL",
+      "description": "URL shortening operations"
+    },
+    {
+      "name": "Auth",
+      "description": "Authentication operations"
+    },
+    {
+      "name": "Analytics",
+      "description": "Analytics operations"
+    },
+    {
+      "name": "Redirect",
+      "description": "URL redirection operations"
+    }
+  ],
+  "paths": {
+    "/api/urls": {
+      "post": {
+        "tags": ["URL"],
+        "summary": "Create a shortened URL",
+        "description": "Creates a new shortened URL with optional custom code for premium users",
+        "operationId": "createUrl",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUrlRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "URL created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UrlResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid URL format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Custom codes are only available for premium users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Custom code already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["URL"],
+        "summary": "Get all URLs for the authenticated user",
+        "description": "Returns a paginated list of URLs created by the authenticated user",
+        "operationId": "getUrls",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "description": "Field to sort by",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "createdAt",
+              "enum": ["createdAt", "clicks"]
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "Sort order",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "desc",
+              "enum": ["asc", "desc"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of URLs retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UrlListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/urls/{shortCode}": {
+      "get": {
+        "tags": ["URL"],
+        "summary": "Get URL by short code",
+        "description": "Returns details of a URL by its short code",
+        "operationId": "getUrlByShortCode",
+        "parameters": [
+          {
+            "name": "shortCode",
+            "in": "path",
+            "description": "Short code of the URL",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "URL details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UrlResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "URL not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized to access this URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/urls/{id}": {
+      "patch": {
+        "tags": ["URL"],
+        "summary": "Update a URL (premium users only)",
+        "description": "Updates a URL with custom code, privacy settings, or expiration date",
+        "operationId": "updateUrl",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the URL to update",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUrlRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "URL updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UrlResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized to update this URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Premium features are only available for premium users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "URL not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Custom code already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["URL"],
+        "summary": "Delete a URL",
+        "description": "Deletes a URL created by the authenticated user",
+        "operationId": "deleteUrl",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the URL to delete",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "URL deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "URL deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized to delete this URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "URL not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Register a new user",
+        "description": "Creates a new user account",
+        "operationId": "register",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Email already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Login a user",
+        "description": "Authenticates a user and returns a JWT token",
+        "operationId": "login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User logged in successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Logout a user",
+        "description": "Logs out a user and invalidates their JWT token",
+        "operationId": "logout",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User logged out successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Logged out successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Get current user",
+        "description": "Returns the currently authenticated user's profile",
+        "operationId": "getMe",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analytics/urls/{id}": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Get URL analytics",
+        "description": "Returns analytics data for a specific URL",
+        "operationId": "getUrlAnalytics",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the URL to get analytics for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "URL analytics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UrlAnalyticsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "URL not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analytics/dashboard": {
+      "get": {
+        "tags": ["Analytics"],
+        "summary": "Get dashboard analytics",
+        "description": "Returns dashboard analytics data for the authenticated user",
+        "operationId": "getDashboard",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dashboard analytics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{shortCode}": {
+      "get": {
+        "tags": ["Redirect"],
+        "summary": "Redirect to original URL",
+        "description": "Redirects to the original URL associated with the short code",
+        "operationId": "redirectToUrl",
+        "parameters": [
+          {
+            "name": "shortCode",
+            "in": "path",
+            "description": "Short code of the URL",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirect to original URL"
+          },
+          "404": {
+            "description": "URL not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "URL has expired",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string",
+                "example": "Error message"
+              },
+              "code": {
+                "type": "string",
+                "example": "ERROR_CODE"
+              },
+              "statusCode": {
+                "type": "integer",
+                "example": 400
+              }
+            }
+          }
+        }
+      },
+      "CreateUrlRequest": {
+        "type": "object",
+        "required": ["originalUrl"],
+        "properties": {
+          "originalUrl": {
+            "type": "string",
+            "example": "https://www.example.com/very/long/url/that/needs/shortening"
+          },
+          "customCode": {
+            "type": "string",
+            "example": "custom-code",
+            "description": "Custom short code (premium users only)"
+          }
+        }
+      },
+      "UpdateUrlRequest": {
+        "type": "object",
+        "properties": {
+          "customCode": {
+            "type": "string",
+            "example": "new-custom-code",
+            "description": "New custom short code"
+          },
+          "isPrivate": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether the URL is private"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-12-31T23:59:59Z",
+            "description": "New expiration date"
+          }
+        }
+      },
+      "UrlResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "cl9z1r3s90000qwer1234567"
+              },
+              "originalUrl": {
+                "type": "string",
+                "example": "https://www.example.com/very/long/url/that/needs/shortening"
+              },
+              "shortCode": {
+                "type": "string",
+                "example": "abc123"
+              },
+              "shortUrl": {
+                "type": "string",
+                "example": "https://short.it/abc123"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2023-01-01T12:00:00Z"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2023-01-01T12:00:00Z"
+              },
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2023-12-31T23:59:59Z"
+              },
+              "userId": {
+                "type": "string",
+                "example": "cl9z1r3s90000qwer7654321",
+                "nullable": true
+              },
+              "clicks": {
+                "type": "integer",
+                "example": 42
+              },
+              "isPrivate": {
+                "type": "boolean",
+                "example": false
+              }
+            }
+          }
+        }
+      },
+      "UrlListResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "urls": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "cl9z1r3s90000qwer1234567"
+                    },
+                    "originalUrl": {
+                      "type": "string",
+                      "example": "https://www.example.com/very/long/url/that/needs/shortening"
+                    },
+                    "shortCode": {
+                      "type": "string",
+                      "example": "abc123"
+                    },
+                    "shortUrl": {
+                      "type": "string",
+                      "example": "https://short.it/abc123"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2023-01-01T12:00:00Z"
+                    },
+                    "clicks": {
+                      "type": "integer",
+                      "example": 42
+                    }
+                  }
+                }
+              },
+              "pagination": {
+                "type": "object",
+                "properties": {
+                  "total": {
+                    "type": "integer",
+                    "example": 42
+                  },
+                  "pages": {
+                    "type": "integer",
+                    "example": 5
+                  },
+                  "page": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "example": 10
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "required": ["name", "email", "password"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john@example.com"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "example": "securePassword123"
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john@example.com"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "example": "securePassword123"
+          }
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "user": {
+                "$ref": "#/components/schemas/User"
+              },
+              "token": {
+                "type": "string",
+                "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+              }
+            }
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "cl9z1r3s90000qwer7654321"
+          },
+          "name": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john@example.com"
+          },
+          "isPremium": {
+            "type": "boolean",
+            "example": false
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-01-01T12:00:00Z"
+          }
+        }
+      },
+      "UserResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "UrlAnalyticsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "$ref": "#/components/schemas/UrlResponse/properties/data"
+              },
+              "clicksByDay": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "date": {
+                      "type": "string",
+                      "format": "date",
+                      "example": "2023-01-01"
+                    },
+                    "clicks": {
+                      "type": "integer",
+                      "example": 10
+                    }
+                  }
+                }
+              },
+              "referrers": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "referrer": {
+                      "type": "string",
+                      "example": "google.com"
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 15
+                    }
+                  }
+                }
+              },
+              "browsers": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "browser": {
+                      "type": "string",
+                      "example": "Chrome"
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 25
+                    }
+                  }
+                }
+              },
+              "devices": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "device": {
+                      "type": "string",
+                      "example": "Desktop"
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 30
+                    }
+                  }
+                }
+              },
+              "countries": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "country": {
+                      "type": "string",
+                      "example": "United States"
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 20
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "DashboardResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "totalUrls": {
+                "type": "integer",
+                "example": 42
+              },
+              "totalClicks": {
+                "type": "integer",
+                "example": 1337
+              },
+              "clicksByDay": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "date": {
+                      "type": "string",
+                      "format": "date",
+                      "example": "2023-01-01"
+                    },
+                    "clicks": {
+                      "type": "integer",
+                      "example": 10
+                    }
+                  }
+                }
+              },
+              "topUrls": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "cl9z1r3s90000qwer1234567"
+                    },
+                    "originalUrl": {
+                      "type": "string",
+                      "example": "https://www.example.com/very/long/url/that/needs/shortening"
+                    },
+                    "shortCode": {
+                      "type": "string",
+                      "example": "abc123"
+                    },
+                    "shortUrl": {
+                      "type": "string",
+                      "example": "https://short.it/abc123"
+                    },
+                    "clicks": {
+                      "type": "integer",
+                      "example": 42
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

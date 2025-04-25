@@ -9,6 +9,7 @@ import urlRoutes from './routes/url.routes';
 import analyticsRoutes from './routes/analytics.routes';
 import redirectRoutes from './routes/redirect.routes';
 import { errorHandler } from './middleware/error.middleware';
+import { setupSwagger } from './swagger';
 
 // Load environment variables
 dotenv.config();
@@ -25,6 +26,9 @@ app.use(helmet()); // Security headers
 app.use(cors()); // Enable CORS
 app.use(express.json()); // Parse JSON bodies
 app.use(morgan('dev')); // HTTP request logger
+
+// Setup Swagger UI for API documentation
+setupSwagger(app);
 
 // API Routes
 app.use('/api/v1/auth', authRoutes);
