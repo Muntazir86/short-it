@@ -203,7 +203,8 @@ export const UrlProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setError(null);
       
       console.log('Fetching URL details for shortCode:', shortCode);
-      const response: any = await urlApi.getUrlByShortCode(shortCode);
+      // Pass the authentication token if available
+      const response: any = await urlApi.getUrlByShortCode(shortCode, token || undefined);
       console.log('URL details response:', response);
       
       // Check if the response has the expected structure

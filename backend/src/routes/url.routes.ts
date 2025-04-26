@@ -20,6 +20,12 @@ router.post('/', protect, authenticatedLimiter, createUrl);
 
 // Protected routes with authenticated rate limiting
 router.get('/', protect, authenticatedLimiter, getUrls);
+
+// Protected route for getting URL details by shortCode (for authenticated users)
+// This specific route must come BEFORE the generic /:shortCode route
+router.get('/details/:shortCode', protect, authenticatedLimiter, getUrlByShortCode);
+
+// Public route for getting URL by shortCode (for redirection)
 router.get('/:shortCode', getUrlByShortCode);
 
 // Premium user routes

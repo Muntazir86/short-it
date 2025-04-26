@@ -91,8 +91,10 @@ export const urlApi = {
     return fetchApi(`/urls?page=${page}&limit=${limit}`, 'GET', undefined, token);
   },
   
-  getUrlByShortCode: async (shortCode: string) => {
-    return fetchApi(`/urls/${shortCode}`, 'GET');
+  getUrlByShortCode: async (shortCode: string, token?: string) => {
+    // Use the proper endpoint for getting URL details
+    // This should be different from the redirect endpoint
+    return fetchApi(`/urls/details/${shortCode}`, 'GET', undefined, token);
   },
   
   updateUrl: async (id: string, data: any, token: string) => {

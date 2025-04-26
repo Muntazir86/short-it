@@ -1,20 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useUrl } from '../context/UrlContext';
+import { useAuth } from '../context/AuthContext';
 import { Url } from '../types';
 
 const UrlDetails: React.FC = () => {
   const { shortCode } = useParams<{ shortCode: string }>();
   const { getUrlDetails, isLoading, error } = useUrl();
+  const { token } = useAuth();
   const [urlData, setUrlData] = useState<Url | null>(null);
   const [isLoadingUrl, setIsLoadingUrl] = useState<boolean>(true);
 
+  // Use a ref to track if we've already fetched data
+  const dataFetched = React.useRef(false);
+
+  // Fetch URL details when the component mounts - only once
   useEffect(() => {
-    const fetchUrlDetails = async () => {
-      if (shortCode) {
-        setIsLoadingUrl(true);
+    // Only fetch if we haven't fetched yet, and we have a shortCode and token
+    if (!dataFetched.current && shortCode && token) {
+      console.log('Component mounted, fetching URL details for:', shortCode);
+      
+      // Mark as fetched to prevent additional fetches
+      dataFetched.current = true;
+      
+      // Set loading state
+      setIsLoadingUrl(true);
+      
+      // Use the getUrlDetails function directly but only once
+      const fetchData = async () => {
         try {
-          console.log('Fetching URL details for:', shortCode);
           const data = await getUrlDetails(shortCode);
           console.log('URL details received:', data);
           setUrlData(data);
@@ -23,11 +37,13 @@ const UrlDetails: React.FC = () => {
         } finally {
           setIsLoadingUrl(false);
         }
-      }
-    };
-
-    fetchUrlDetails();
-  }, [shortCode, getUrlDetails]);
+      };
+      
+      fetchData();
+    }
+    
+    // No cleanup needed since we're not setting up any subscriptions
+  }, []); // Empty dependency array means this only runs once on mount
 
   if (isLoadingUrl) {
     return (
