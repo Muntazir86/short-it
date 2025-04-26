@@ -1,15 +1,18 @@
-import React from 'react';
-import { Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useUrl } from '../context/UrlContext';
 import UrlShortener from '../components/url/UrlShortener';
 import UrlList from '../components/url/UrlList';
 
 const Dashboard: React.FC = () => {
-  const { isAuthenticated, user } = useAuth();
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" />;
-  }
+  const { user } = useAuth();
+  const { triggerFetch, isLoading } = useUrl();
+  
+  // Explicitly request URL data when the dashboard loads
+  useEffect(() => {
+    console.log('Dashboard mounted, triggering URL fetch');
+    triggerFetch();
+  }, [triggerFetch]);
 
   return (
     <div className="container mx-auto px-16 py-32">

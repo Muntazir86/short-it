@@ -1,18 +1,42 @@
-import React from 'react';
-import { useParams, Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { useUrl } from '../context/UrlContext';
+import { Url } from '../types';
 
 const UrlDetails: React.FC = () => {
   const { shortCode } = useParams<{ shortCode: string }>();
-  const { isAuthenticated } = useAuth();
-  const { getUrlDetails } = useUrl();
+  const { getUrlDetails, isLoading, error } = useUrl();
+  const [urlData, setUrlData] = useState<Url | null>(null);
+  const [isLoadingUrl, setIsLoadingUrl] = useState<boolean>(true);
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+  useEffect(() => {
+    const fetchUrlDetails = async () => {
+      if (shortCode) {
+        setIsLoadingUrl(true);
+        try {
+          console.log('Fetching URL details for:', shortCode);
+          const data = await getUrlDetails(shortCode);
+          console.log('URL details received:', data);
+          setUrlData(data);
+        } catch (err) {
+          console.error('Error fetching URL details:', err);
+        } finally {
+          setIsLoadingUrl(false);
+        }
+      }
+    };
+
+    fetchUrlDetails();
+  }, [shortCode, getUrlDetails]);
+
+  if (isLoadingUrl) {
+    return (
+      <div className="container mx-auto px-16 py-32 text-center">
+        <h1 className="text-h2 mb-16">Loading...</h1>
+        <p>Fetching URL details...</p>
+      </div>
+    );
   }
-
-  const urlData = shortCode ? getUrlDetails(shortCode) : undefined;
 
   if (!urlData) {
     return (

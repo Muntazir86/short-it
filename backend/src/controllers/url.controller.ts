@@ -54,14 +54,23 @@ export const createUrl = async (
       ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // 1 year for premium
       : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);  // 30 days for regular
     
-    // Create URL in database
+    // Since we're now using the protect middleware, req.user should always be available
+    if (!req.user || !req.user.id) {
+      return next(
+        new AppError('Authentication required to create URLs', 401, 'UNAUTHORIZED')
+      );
+    }
+    
+    console.log('Creating URL for authenticated user:', { userId: req.user.id });
+    
+    // Create URL in database with the authenticated user's ID
     const url = await prisma.url.create({
       data: {
         originalUrl,
         shortCode,
         expiresAt,
-        userId: req.user?.id, // Link to user if authenticated
-        isPrivate: false // Default to public
+        userId: req.user.id, // User ID is guaranteed to exist now
+        isPrivate: req.body.isPrivate || false // Handle private URLs based on request
       }
     });
     

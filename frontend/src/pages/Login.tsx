@@ -26,10 +26,18 @@ const Login: React.FC = () => {
     try {
       setIsLoading(true);
       setError(null);
+      
+      console.log('Attempting login with:', { email });
       await login(email, password);
-      navigate('/dashboard');
-    } catch (err) {
-      setError('Invalid email or password');
+      
+      // Add a small delay to ensure state updates before navigation
+      setTimeout(() => {
+        console.log('Login successful, navigating to dashboard');
+        navigate('/dashboard');
+      }, 500);
+    } catch (err: any) {
+      console.error('Login error in component:', err);
+      setError(err.message || 'Invalid email or password');
     } finally {
       setIsLoading(false);
     }

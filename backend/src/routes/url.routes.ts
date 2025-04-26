@@ -15,8 +15,8 @@ import {
 
 const router = express.Router();
 
-// Public routes with anonymous rate limiting
-router.post('/', anonymousLimiter, createUrl);
+// Protected routes with authenticated rate limiting
+router.post('/', protect, authenticatedLimiter, createUrl);
 
 // Protected routes with authenticated rate limiting
 router.get('/', protect, authenticatedLimiter, getUrls);

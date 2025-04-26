@@ -13,6 +13,10 @@ import Register from './pages/Register';
 import NotFound from './pages/NotFound';
 // Layout
 import Layout from './components/layout/Layout';
+// Auth
+import ProtectedRoute from './components/auth/ProtectedRoute';
+// Redirect
+import Redirect from './components/redirect/Redirect';
 
 function App() {
   return (
@@ -21,10 +25,26 @@ function App() {
         <UrlProvider>
           <Routes>
             <Route path="/" element={<Layout><HomePage /></Layout>} />
-            <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
-            <Route path="/url/:shortCode" element={<Layout><UrlDetails /></Layout>} />
+            <Route 
+              path="/dashboard" 
+              element={
+                <ProtectedRoute>
+                  <Layout><Dashboard /></Layout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/url/:shortCode" 
+              element={
+                <ProtectedRoute>
+                  <Layout><UrlDetails /></Layout>
+                </ProtectedRoute>
+              } 
+            />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            {/* Add route for short URL redirection */}
+            <Route path="/:shortCode" element={<Redirect />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </UrlProvider>

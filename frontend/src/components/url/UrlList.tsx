@@ -1,12 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useUrl } from '../../context/UrlContext';
+import { Url } from '../../types';
 
 const UrlList: React.FC = () => {
-  const { urls, deleteUrl } = useUrl();
+  const { urls = [], isLoading, deleteUrl } = useUrl();
 
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString();
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
   };
 
   const truncateUrl = (url: string, maxLength = 50) => {
@@ -19,7 +20,15 @@ const UrlList: React.FC = () => {
     // You could add a toast notification here
   };
 
-  if (urls.length === 0) {
+  if (isLoading) {
+    return (
+      <div className="text-center py-48">
+        <h3>Loading your URLs...</h3>
+      </div>
+    );
+  }
+  
+  if (!urls || urls.length === 0) {
     return (
       <div className="text-center py-48">
         <h3>You haven't shortened any URLs yet</h3>
