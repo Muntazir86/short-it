@@ -33,7 +33,7 @@
     }
   ],
   "paths": {
-    "/api/urls": {
+    "/api/v1/urls": {
       "post": {
         "tags": ["URL"],
         "summary": "Create a shortened URL",
@@ -170,7 +170,7 @@
         }
       }
     },
-    "/api/urls/{shortCode}": {
+    "/api/v1/urls/{shortCode}": {
       "get": {
         "tags": ["URL"],
         "summary": "Get URL by short code",
@@ -221,7 +221,7 @@
         }
       }
     },
-    "/api/urls/{id}": {
+    "/api/v1/urls/{id}": {
       "patch": {
         "tags": ["URL"],
         "summary": "Update a URL (premium users only)",
@@ -371,7 +371,7 @@
         }
       }
     },
-    "/api/auth/register": {
+    "/api/v1/auth/register": {
       "post": {
         "tags": ["Auth"],
         "summary": "Register a new user",
@@ -421,7 +421,7 @@
         }
       }
     },
-    "/api/auth/login": {
+    "/api/v1/auth/login": {
       "post": {
         "tags": ["Auth"],
         "summary": "Login a user",
@@ -461,7 +461,7 @@
         }
       }
     },
-    "/api/auth/logout": {
+    "/api/v1/auth/logout": {
       "post": {
         "tags": ["Auth"],
         "summary": "Logout a user",
@@ -506,7 +506,7 @@
         }
       }
     },
-    "/api/auth/me": {
+    "/api/v1/auth/me": {
       "get": {
         "tags": ["Auth"],
         "summary": "Get current user",
@@ -541,7 +541,7 @@
         }
       }
     },
-    "/api/analytics/urls/{id}": {
+    "/api/v1/analytics/urls/{id}": {
       "get": {
         "tags": ["Analytics"],
         "summary": "Get URL analytics",
@@ -597,7 +597,7 @@
         }
       }
     },
-    "/api/analytics/dashboard": {
+    "/api/v1/analytics/dashboard": {
       "get": {
         "tags": ["Analytics"],
         "summary": "Get dashboard analytics",
