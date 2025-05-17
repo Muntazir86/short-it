@@ -1,0 +1,34 @@
+# Node.js / TypeScript specific
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Prisma
+prisma/*.db
+prisma/migrations/*_init/migration.sql
+
+# IDE specific files
+.idea/
+.vscode/
+*.code-workspace
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Cache
+.npm
+.eslintcache
