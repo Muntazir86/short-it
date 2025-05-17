@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { prisma } from '../server';
+import { prisma } from '../prisma';
 import { AppError } from './error.middleware';
 
 // Extend Express Request interface to include user

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { prisma } from '../server';
+import { prisma } from '../prisma';
 import { AppError } from '../middleware/error.middleware';
 
 // Redirect to the original URL and track click data

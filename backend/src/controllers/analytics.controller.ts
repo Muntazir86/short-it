@@ -1,6 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { prisma } from '../server';
+import { prisma } from '../prisma';
 import { AppError } from '../middleware/error.middleware';
+
+interface TotalClicksResult {
+  total: number;
+}
 
 // Get analytics for a specific URL
 export const getUrlAnalytics = async (
@@ -188,10 +192,9 @@ export const getDashboard = async (
     });
     
     // Get total clicks for all user URLs
-    const totalClicks = await prisma.$queryRaw`
-      SELECT SUM(clicks) as total
-      FROM urls
-      WHERE user_id = ${userId}
+    const totalClicks = await prisma.$queryRaw<TotalClicksResult[]>`
+      SELECT COUNT(*) as total FROM clicks 
+      WHERE url_id IN (SELECT id FROM urls WHERE user_id = ${req.user?.id})
     `;
     
     // Get top performing URLs

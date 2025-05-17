@@ -39,10 +39,10 @@ export const createRateLimiter = (type: 'anonymous' | 'authenticated' | 'premium
         return true;
       }
       return false;
-    },
+    },    
     keyGenerator: (req: Request) => {
       // Use user ID for authenticated users, IP for anonymous
-      return req.user ? req.user.id : req.ip;
+      return req.user ? req.user.id : (req.ip || 'unknown');
     }
   });
 };

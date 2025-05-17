@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
-import { prisma } from '../server';
+import { prisma } from '../prisma';
 import { AppError } from '../middleware/error.middleware';
 import { generateToken } from '../utils/token.utils';
 

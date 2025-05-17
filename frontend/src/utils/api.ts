@@ -1,7 +1,7 @@
 import { User } from '../types';
 
-// Using the proxy configuration in setupProxy.js
-const API_URL = '/api/v1';
+// Using environment variables for API URL
+const API_URL = process.env.REACT_APP_API_URL || '/api/v1';
 
 // Helper function for making API requests
 async function fetchApi<T>(

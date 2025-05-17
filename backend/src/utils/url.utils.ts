@@ -1,4 +1,4 @@
-import { prisma } from '../server';
+import { prisma } from '../prisma';
 
 // Generate a random short code for URLs
 export const generateShortCode = (length: number = 6): string => {

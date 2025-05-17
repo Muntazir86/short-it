@@ -1,16 +1,32 @@
-import jwt from 'jsonwebtoken';
+import jwt, { Secret, SignOptions } from 'jsonwebtoken';
+
+interface TokenPayload {
+  id: string;
+}
 
 // Generate JWT token for authentication
 export const generateToken = (id: string): string => {
-  return jwt.sign({ id }, process.env.JWT_SECRET as string, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '24h'
-  });
+  if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET is not defined');
+  }
+  
+  const payload: TokenPayload = { id };
+  const secret: Secret = process.env.JWT_SECRET;
+  // Use a literal string type that matches jwt expected format
+  const expiresIn = '24h';
+  const options: SignOptions = { expiresIn };
+  
+  return jwt.sign(payload, secret, options);
 };
 
 // Verify JWT token
-export const verifyToken = (token: string): any => {
+export const verifyToken = (token: string): TokenPayload | null => {
+  if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET is not defined');
+  }
+
   try {
-    return jwt.verify(token, process.env.JWT_SECRET as string);
+    return jwt.verify(token, process.env.JWT_SECRET) as TokenPayload;
   } catch (error) {
     return null;
   }
