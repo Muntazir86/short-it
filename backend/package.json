@@ -10,6 +10,9 @@
     "prisma:generate": "npx prisma generate --schema=./src/prisma/schema.prisma",
     "test": "jest"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "keywords": [
     "url-shortener",
     "api",
