@@ -15,7 +15,7 @@ const UrlList: React.FC = () => {
   };
 
   const handleCopy = (shortCode: string) => {
-    const baseUrl = window.location.origin;
+    const baseUrl = process.env.REACT_APP_BASE_URL;
     navigator.clipboard.writeText(`${baseUrl}/${shortCode}`);
     // You could add a toast notification here
   };
@@ -64,7 +64,7 @@ const UrlList: React.FC = () => {
               </td>
               <td className="p-16">
                 <span className="text-primary font-medium">
-                  {`${window.location.origin}/${url.shortCode}`}
+                  {`${process.env.REACT_APP_BASE_URL}/${url.shortCode}`}
                 </span>
               </td>
               <td className="p-16">{formatDate(url.createdAt)}</td>

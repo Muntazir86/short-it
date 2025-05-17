@@ -63,7 +63,7 @@ const UrlDetails: React.FC = () => {
     );
   }
 
-  const fullShortUrl = `${window.location.origin}/${urlData.shortCode}`;
+  const fullShortUrl = `${process.env.REACT_APP_BASE_URL}/${urlData.shortCode}`;
 
   return (
     <div className="container mx-auto px-16 py-32">

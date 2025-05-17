@@ -47,6 +47,6 @@ export const isValidUrl = (url: string): boolean => {
 
 // Create the full short URL from a short code
 export const getFullShortUrl = (shortCode: string): string => {
-  const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+  const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
   return `${baseUrl}/${shortCode}`;
 };

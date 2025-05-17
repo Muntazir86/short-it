@@ -50,7 +50,7 @@ const UrlShortener: React.FC = () => {
       const result = await addUrl(url, options.customCode, options.isPrivate);
       
       // Get the base URL from the window location
-      const baseUrl = window.location.origin;
+      const baseUrl = process.env.REACT_APP_BASE_URL;
       setShortenedUrl(`${baseUrl}/${result.shortCode}`);
       
       // Clear input if not authenticated (for homepage)

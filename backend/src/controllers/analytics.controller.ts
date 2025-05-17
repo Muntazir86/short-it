@@ -213,7 +213,7 @@ export const getDashboard = async (
     const formattedTopUrls = topUrls.map(url => ({
       id: url.id,
       shortCode: url.shortCode,
-      shortUrl: `${process.env.BASE_URL || 'http://localhost:3000'}/${url.shortCode}`,
+      shortUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/${url.shortCode}`,
       clicks: url.clicks
     }));
     
