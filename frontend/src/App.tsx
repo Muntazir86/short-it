@@ -20,7 +20,7 @@ import Redirect from './components/redirect/Redirect';
 
 function App() {
   return (
-    <Router>
+    <Router basename="/short-it">
       <AuthProvider>
         <UrlProvider>
           <Routes>
